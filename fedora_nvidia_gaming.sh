@@ -42,17 +42,23 @@ echo -e "\nSjekker Nvidia versjon en gang til, bare for å være sikker."
 modinfo -F version nvidia
 read -p "Trykk [Enter] for å fortsette..."
 
-# Bytter ut åpne ffmpeg codecs med proprietære
-echo -e "\nInstallerer alle ffmpeg codecs (trengs ofte for cutscenes og intro til spill)."
-sudo dnf swap ffmpeg-free ffmpeg --allowerasing
-read -p "Trykk [Enter] for å fortsette..."
-
 # Hardware codecs for Nvidia
 echo -e "\nInstallerer hardware codecs for Nvidia."
 sudo dnf install libva-nvidia-driver
 read -p "Trykk [Enter] for å fortsette..."
 
-# Gstreamer framwork og mer..
+# Installerer Nvidia GeForce Now
+echo -e "\nInstallerer Nvidia Geforce NOW for strømming av spill."
+flatpak remote-add --user --if-not-exists GeForceNOW https://international.download.nvidia.com/GFNLinux/flatpak/geforcenow.flatpakrep
+flatpak install --user GeForceNOW com.nvidia.geforcenow
+read -p "Trykk [Enter] for å fortsette..."
+
+# Bytter ut åpne ffmpeg codecs med proprietære
+echo -e "\nInstallerer alle ffmpeg codecs (trengs ofte for cutscenes og intro til spill)."
+sudo dnf swap ffmpeg-free ffmpeg --allowerasing
+read -p "Trykk [Enter] for å fortsette..."
+
+# Gstreamer framework og mer..
 echo -e "\nInstallerer andre proprietære codecs du kan trenge."
 sudo dnf update @multimedia --setopt="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
 read -p "Trykk [Enter] for å fortsette..."
