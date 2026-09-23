@@ -11,7 +11,7 @@ Isåfall har jeg her laget et [skript som installerer alt du måtte trenge av dr
 
 ![Min desktop](https://github.com/Gauteweb/GNU-Linux/blob/main/stormtrooper_desktop.jpg)
 
-Bare [kjør skriptet](https://github.com/Gauteweb/GNU-Linux/blob/main/fedora_nvidia_gaming.sh), ta en restart og voila: Du har en super gaming-maskin med de nyeste og beste Nvidia-driverne og alt du trenger av programvare for å starte og spille, bare logg inn på Steam, GOG eller Epic og last ned spillene dine.
+Bare [kjør skriptet](https://github.com/Gauteweb/GNU-Linux/blob/main/fedora_nvidia_gaming.sh), ta en restart og voila: Du har en super gaming-maskin med de nyeste og beste Nvidia-driverne og alt du trenger av programvare for å starte og spille, bare logg inn på Steam, GOG eller Epic og last ned spillene dine. Du kan også strømme spill fra GeForce NOW om du har bra nok nettverk.
 
 Sjekk også ut mine [rapporter på ProtonDB](https://www.protondb.com/users/440092954) for tweaking av individuelle spill på Fedora og SteamOS.
 
