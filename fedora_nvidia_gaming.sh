@@ -29,16 +29,21 @@ echo -e "Installerer nyeste Nvidia-drivere via DNF. NB: Hvis Secure Boot er akti
 sudo dnf install akmod-nvidia
 
 # Ferdig med å installere Nvidia-drivere
-echo -e "\nMerk: Det kan ta opp mot 5 minutter før driveren er helt oppdatert"
-read -p "Trykk [Enter] for sjekke driver-versjon..."
+nedtellingsfunksjon() {
+    local sekunder=60
+    while ((sekunder > 0)); do
+        printf "\rVenter %2d sekunder før vi tester driver-versjonen... " "$sekunder"
+        sleep 1
+        ((sekunder--))
+    done
+    printf "\r60 sekunder har gått — fortsetter!     \n"
+}
 
-# Oppdater med DNF
+echo "Det kan ta et minutt eller to før driveren er helt oppdatert, så vi venter et minutt."
+nedtellingsfunksjon    # venter 60 sekunder med live nedtelling
+
+# Sjekk Nvidia-versjon
 echo -e "\nSjekker Nvidia-versjon, om det ikke kommer opp et versjonsnummer, vent noen minutter før du går videre:"
-modinfo -F version nvidia
-read -p "Trykk [Enter] for å teste driver-versjon en gang til..."
-
-# Oppdater med DNF
-echo -e "\nSjekker Nvidia versjon en gang til, bare for å være sikker."
 modinfo -F version nvidia
 read -p "Trykk [Enter] for å fortsette..."
 
