@@ -24,7 +24,7 @@ read -p "Trykk [Enter] for å fortsette..."
 echo -e "\nLegger til Nvidias offisielle repo og installerer nyeste Nvidia-drivere (G06)."
 echo -e "NB: Hvis Secure Boot er aktivert i BIOS kan det skape problemer ved restart. Enkleste løsning er å deaktivere Secure Boot i BIOS."
 sudo zypper --gpg-auto-import-keys addrepo --refresh https://download.nvidia.com/opensuse/tumbleweed/ nvidia
-sudo zypper --gpg-auto-import-keys install -y x11-video-nvidiaG06
+sudo zypper --gpg-auto-import-keys --auto-agree-with-licenses install -y x11-video-nvidiaG06
 read -p "Trykk [Enter] for å fortsette..."
 
 nedtellingsfunksjon() {
@@ -56,7 +56,7 @@ read -p "Trykk [Enter] for å fortsette..."
 # kun leverer frie/åpne codecs.
 echo -e "\nLegger til Packman-repoet og bytter til full ffmpeg med alle codecs."
 sudo zypper --gpg-auto-import-keys addrepo -cfp 90 'https://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Tumbleweed/' packman
-sudo zypper --gpg-auto-import-keys install -y --from packman ffmpeg libavcodec-full libavdevice-full
+sudo zypper --gpg-auto-import-keys --auto-agree-with-licenses install -y --from packman ffmpeg libavcodec-full libavdevice-full
 read -p "Trykk [Enter] for å fortsette..."
 
 # Sikrer at flathub er lagt til (trengs for appene under)
