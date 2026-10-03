@@ -2,7 +2,7 @@
 
 # Skript skrevet av: Gaute Holmin.
 
-# ADVARSEL: Deler av dette skriptet feiler per nå! ikke kjør dette hvis du ikke ønsker å feilsøke selv, kom heller tilbake senere og se om jeg har fått rettet opp feilene...
+# ADVARSEL: Dette skriptet har per nå feil i seg. Ikke brukt det hvis du ikke er forberedt på å feilsøke. Jeg jobber med å rette feilene.
 
 # Dette skriptet vil installere alt du trenger for å komme i gang med gaming på openSUSE Tumbleweed (KDE Plasma Desktop) med Nvidia grafikkort.
 # Skriptet vil også gjøre noen steg som forbedrer ytelsen på Tumbleweed for gaming.
@@ -26,6 +26,7 @@ read -p "Trykk [Enter] for å fortsette..."
 # Obs: Hvis Secure Boot er aktivert i BIOS/UEFI, må du enten deaktivere det eller selv signere Nvidia-kjernemodulen, ellers starter ikke driveren.
 echo -e "\nLegger til Nvidias offisielle repo og installerer nyeste Nvidia-drivere (G06)."
 echo -e "NB: Hvis Secure Boot er aktivert i BIOS kan det skape problemer ved restart. Enkleste løsning er å deaktivere Secure Boot i BIOS."
+sudo rpm --import https://download.nvidia.com/opensuse/tumbleweed/repodata/repomd.xml.key
 sudo zypper --gpg-auto-import-keys addrepo --refresh https://download.nvidia.com/opensuse/tumbleweed/ nvidia
 sudo zypper --gpg-auto-import-keys --auto-agree-with-licenses install -y x11-video-nvidiaG06
 read -p "Trykk [Enter] for å fortsette..."
@@ -58,6 +59,7 @@ read -p "Trykk [Enter] for å fortsette..."
 # Packman er det etablerte tredjeparts-repoet for kodeker på openSUSE, og er nødvendig fordi de offisielle repoene
 # kun leverer frie/åpne codecs.
 echo -e "\nLegger til Packman-repoet og bytter til full ffmpeg med alle codecs."
+sudo rpm --import https://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Tumbleweed/repodata/repomd.xml.key
 sudo zypper --gpg-auto-import-keys addrepo -cfp 90 'https://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Tumbleweed/' packman
 sudo zypper --gpg-auto-import-keys --auto-agree-with-licenses install -y --from packman ffmpeg libavcodec-full libavdevice-full
 read -p "Trykk [Enter] for å fortsette..."
@@ -69,7 +71,7 @@ read -p "Trykk [Enter] for å fortsette..."
 
 # Installere GameMode
 echo -e "\nInstallerer GameMode via Zypper (det kan hende dette er installert fra før)."
-sudo zypper install -y gamemode
+sudo zypper --auto-agree-with-licenses install -y gamemode
 read -p "Trykk [Enter] for å fortsette..."
 
 # Installere ProtonPlus
@@ -79,12 +81,12 @@ read -p "Trykk [Enter] for å fortsette..."
 
 # Installere Protontricks
 echo -e "\nInstallerer Protontricks via Zypper."
-sudo zypper install -y protontricks
+sudo zypper --auto-agree-with-licenses install -y protontricks
 read -p "Trykk [Enter] for å fortsette..."
 
 # Installere Steam
 echo -e "\nInstallerer Steam via Zypper (ligger i non-oss-repoet som er standard aktivert)."
-sudo zypper install -y steam
+sudo zypper --auto-agree-with-licenses install -y steam
 read -p "Trykk [Enter] for å fortsette..."
 
 # Installere Heroic Launcher
