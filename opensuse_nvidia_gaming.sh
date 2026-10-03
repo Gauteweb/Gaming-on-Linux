@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Skript skrevet av: Gaute Holmin. Skriptet inneholder feil som gjør at deler av det vil feile per dags dato.
+# Skript skrevet av: Gaute Holmin. Skriptet er under utvikling og har feil per dags dato.
 
 # Dette skriptet vil installere alt du trenger for å komme i gang med gaming på openSUSE Tumbleweed (KDE Plasma Desktop) med Nvidia grafikkort.
 # Skriptet vil også gjøre noen steg som forbedrer ytelsen på Tumbleweed for gaming.
@@ -58,9 +58,8 @@ read -p "Trykk [Enter] for å fortsette..."
 # kun leverer frie/åpne codecs.
 echo -e "\nLegger til Packman-repoet og bytter til full ffmpeg med alle codecs."
 sudo rpm --import https://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Tumbleweed/repodata/repomd.xml.key
-# NB: Hvis zypper likevel spiller om å stole på Packmans signernøkkel (fingeravtrykk F887 5B88 0D51 8B6B 8C53 0D13 45A1 D067 1ABD 1AFB),
-# svar 'a' (trust always). Det er Packmans offisielle nøkkel.
 sudo zypper --gpg-auto-import-keys addrepo -cfp 90 'https://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Tumbleweed/' packman
+sudo zypper --gpg-auto-import-keys refresh packman
 sudo zypper --gpg-auto-import-keys --auto-agree-with-licenses install -y --from packman ffmpeg libavcodec-full libavdevice-full
 read -p "Trykk [Enter] for å fortsette..."
 
