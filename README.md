@@ -26,5 +26,13 @@ Siden Fedora har rullende oppdateringer kommer det ganske mye småoppdateringer 
 
 Dette skriptet forkorter tiden brukt på oppdateringer ganske mye, spesielt om du knytter det opp til en knapp på for eksempel Stream Deck, eller ved å knytte det til en tastatursnarvei på tastaturet ditt (_dette gjør du under tastatur-innstillingene i Fedora_).
 
+## OpenSUSE Tumbletweed og Nvidia oppsett for gaming
+
+Har du installert [OpenSUSE Tumbletweed](https://get.opensuse.org/tumbleweed/) og du har en maskin med Nvidia grafikkort? 
+
+Isåfall har jeg her laget et [skript som installerer alt du måtte trenge av drivere og programvare](https://github.com/Gauteweb/Gaming-on-Linux/blob/main/opensuse_nvidia_gaming.sh) for å enkelt komme igang med gaming på Linux. 
+
+Dette skriptet er litt dårlig testet per nå (_jeg har kun testet det på en VM_), så jeg kan ikke garantere at det fungerer like feilfritt som Fedora-skriptet.
+
 ## ProtonDB
 Sjekk også ut mine [rapporter på ProtonDB](https://www.protondb.com/users/440092954) for tweaking av individuelle spill på Fedora og SteamOS.
