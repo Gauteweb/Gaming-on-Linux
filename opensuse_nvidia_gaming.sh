@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Skript skrevet av: Gaute Holmin og er under aktiv utvikling, forvent feil!
-
+# Skript skrevet av: Gaute Holmin.
 # Dette skriptet vil installere alt du trenger for å komme i gang med gaming på openSUSE Tumbleweed (KDE Plasma Desktop) med Nvidia grafikkort.
 # Skriptet vil også gjøre noen steg som forbedrer ytelsen på Tumbleweed for gaming.
 # Skriptet er ment for openSUSE Tumbleweed (rolling release). Det passer IKKE for openSUSE Leap (andre repo-URLer og driverpakker der).
@@ -42,15 +41,23 @@ nedtellingsfunksjon() {
 echo "Kjernemodulen bygges ferdig i bakgrunnen, så vi venter et minutt."
 nedtellingsfunksjon    # venter 60 sekunder med live nedtelling
 
-# Sjekk Nvidia-versjon
+# Sjekk Nvidia-versjon (modinfo ligger i kmod-pakken, som ikke alltid er installert)
+sudo zypper --auto-agree-with-licenses install -y kmod
 echo -e "\nSjekker Nvidia-versjon, om det ikke kommer opp et versjonsnummer, vent noen minutter før du går videre:"
-modinfo -F version nvidia
+/usr/sbin/modinfo -F version nvidia || modinfo -F version nvidia
 read -p "Trykk [Enter] for å fortsette..."
 
-# Installerer Nvidia GeForce Now
+# Installerer Nvidia GeForce Now (strømming av spill).
+# NB: Nvidias flatpak-repo har av og til ødelagt metadata ("no summary found"). Dette steget er ikke kritisk
+# for gaming-oppsettet, så hvis det feiler hopper skriptet over det. Prøv igjen senere eller installer fra flathub.
 echo -e "\nInstallerer Nvidia GeForce NOW for strømming av spill (via Flatpak)."
 flatpak remote-add --user --if-not-exists GeForceNOW https://international.download.nvidia.com/GFNLinux/flatpak/geforcenow.flatpakrep
-flatpak install --user -y GeForceNOW com.nvidia.geforcenow
+if flatpak install --user -y GeForceNOW com.nvidia.geforcenow; then
+    echo -e "GeForce NOW ble installert."
+else
+    echo -e "\nAdvarsel: GeForce NOW kunne ikke installeres nå (Nvidias flatpak-repo har av og til ødelagt metadata)."
+    echo -e "Dette er IKKE kritisk for gaming — prøv på nytt senere med: flatpak install --user GeForceNOW com.nvidia.geforcenow"
+fi
 read -p "Trykk [Enter] for å fortsette..."
 
 # Bytter ut åpne ffmpeg codecs med fullversjonen fra Packman (trengs ofte for cutscenes og intro til spill).
@@ -91,7 +98,7 @@ echo -e "\nInstallerer Heroic Launcher via Flatpak (for å kunne spille spill fr
 flatpak install --user -y flathub com.heroicgameslauncher.hgl
 read -p "Trykk [Enter] for å fortsette..."
 
-# Justerer kjerneparametre for gaming.
+# Justerer kjerneparametre for gaming.t.
 echo -e "\nJusterer kjerneparametre for gaming (preempt=full og transparent_hugepage=always)."
 if grep -q '^GRUB_CMDLINE_LINUX_DEFAULT=' /etc/default/grub; then
     sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT="\([^"]*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 preempt=full transparent_hugepage=always"/' /etc/default/grub
