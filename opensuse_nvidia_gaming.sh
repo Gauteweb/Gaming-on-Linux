@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Skript skrevet av: Gaute Holmin. Skriptet er under utvikling og har feil per dags dato.
+# Skript skrevet av: Gaute Holmin og er under utvikling, forvent feil!
 
 # Dette skriptet vil installere alt du trenger for å komme i gang med gaming på openSUSE Tumbleweed (KDE Plasma Desktop) med Nvidia grafikkort.
 # Skriptet vil også gjøre noen steg som forbedrer ytelsen på Tumbleweed for gaming.
@@ -11,9 +11,10 @@
 # ./opensuse_nvidia_gaming.sh
 
 # Sjekker at Tumbleweed er helt oppdatert før du starter.
+# --gpg-auto-import-keys godtar eventuelle nye repo-nøkler automatisk (Packman/Nvidia), så ingen prompt stopper skriptet.
 echo -e "\nSjekker at systemet er helt oppdatert før vi starter. Underveis kan det hende at du må skrive inn passordet ditt flere ganger."
 echo -e "På Tumbleweed oppgraderer vi med 'zypper dup' (dist-upgrade), som er riktig måte å holde en rolling release oppdatert på."
-sudo zypper dup -y
+sudo zypper --gpg-auto-import-keys dup -y
 read -p "Trykk [Enter] for å starte..."
 
 # Oppstart av skript
