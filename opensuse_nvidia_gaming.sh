@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Skript skrevet av: Gaute Holmin og er under utvikling, forvent feil!
+# Skript skrevet av: Gaute Holmin og er under aktiv utvikling, forvent feil!
 
 # Dette skriptet vil installere alt du trenger for å komme i gang med gaming på openSUSE Tumbleweed (KDE Plasma Desktop) med Nvidia grafikkort.
 # Skriptet vil også gjøre noen steg som forbedrer ytelsen på Tumbleweed for gaming.
@@ -25,7 +25,6 @@ read -p "Trykk [Enter] for å fortsette..."
 # Obs: Hvis Secure Boot er aktivert i BIOS/UEFI, må du enten deaktivere det eller selv signere Nvidia-kjernemodulen, ellers starter ikke driveren.
 echo -e "\nLegger til Nvidias offisielle repo og installerer nyeste Nvidia-drivere (G06)."
 echo -e "NB: Hvis Secure Boot er aktivert i BIOS kan det skape problemer ved restart. Enkleste løsning er å deaktivere Secure Boot i BIOS."
-sudo rpm --import https://download.nvidia.com/opensuse/tumbleweed/repodata/repomd.xml.key
 sudo zypper --gpg-auto-import-keys addrepo --refresh https://download.nvidia.com/opensuse/tumbleweed/ nvidia
 sudo zypper --gpg-auto-import-keys --auto-agree-with-licenses install -y x11-video-nvidiaG06
 read -p "Trykk [Enter] for å fortsette..."
@@ -58,9 +57,7 @@ read -p "Trykk [Enter] for å fortsette..."
 # Packman er det etablerte tredjeparts-repoet for kodeker på openSUSE, og er nødvendig fordi de offisielle repoene
 # kun leverer frie/åpne codecs.
 echo -e "\nLegger til Packman-repoet og bytter til full ffmpeg med alle codecs."
-sudo rpm --import https://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Tumbleweed/repodata/repomd.xml.key
 sudo zypper --gpg-auto-import-keys addrepo -cfp 90 'https://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Tumbleweed/' packman
-sudo zypper --gpg-auto-import-keys refresh packman
 sudo zypper --gpg-auto-import-keys --auto-agree-with-licenses install -y --from packman ffmpeg libavcodec-full libavdevice-full
 read -p "Trykk [Enter] for å fortsette..."
 
