@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Skript skrevet av: Gaute Holmin.
-# ADVARSEL: Dette er et AI generert skript hvor jeg har fått Mistral AI til å konvertere mitt Fedora-skript til OpenSUSE. Jeg har ikke testet dette skriptet ennå (skal det snart).
 # Dette skriptet vil installere alt du trenger for å komme i gang med gaming på openSUSE Tumbleweed (KDE Plasma Desktop) med Nvidia grafikkort.
 # Skriptet vil også gjøre noen steg som forbedrer ytelsen på Tumbleweed for gaming.
 # Skriptet er ment for openSUSE Tumbleweed (rolling release). Det passer IKKE for openSUSE Leap (andre repo-URLer og driverpakker der).
@@ -24,7 +23,7 @@ read -p "Trykk [Enter] for å fortsette..."
 # Obs: Hvis Secure Boot er aktivert i BIOS/UEFI, må du enten deaktivere det eller selv signere Nvidia-kjernemodulen, ellers starter ikke driveren.
 echo -e "\nLegger til Nvidias offisielle repo og installerer nyeste Nvidia-drivere (G06)."
 echo -e "NB: Hvis Secure Boot er aktivert i BIOS kan det skape problemer ved restart. Enkleste løsning er å deaktivere Secure Boot i BIOS."
-sudo zypper --gpg-auto-import-keys addref --refresh https://download.nvidia.com/opensuse/tumbleweed/ nvidia
+sudo zypper --gpg-auto-import-keys addrepo --refresh https://download.nvidia.com/opensuse/tumbleweed/ nvidia
 sudo zypper --gpg-auto-import-keys install -y x11-video-nvidiaG06
 read -p "Trykk [Enter] for å fortsette..."
 
