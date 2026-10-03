@@ -1,6 +1,9 @@
 #!/bin/bash
 
 # Skript skrevet av: Gaute Holmin.
+
+# ADVARSEL: Deler av dette skriptet feiler per nå! ikke kjør dette hvis du ikke ønsker å feilsøke selv, kom heller tilbake senere og se om jeg har fått rettet opp feilene...
+
 # Dette skriptet vil installere alt du trenger for å komme i gang med gaming på openSUSE Tumbleweed (KDE Plasma Desktop) med Nvidia grafikkort.
 # Skriptet vil også gjøre noen steg som forbedrer ytelsen på Tumbleweed for gaming.
 # Skriptet er ment for openSUSE Tumbleweed (rolling release). Det passer IKKE for openSUSE Leap (andre repo-URLer og driverpakker der).
