@@ -43,13 +43,19 @@ nedtellingsfunksjon    # venter 60 sekunder med live nedtelling
 
 # Sjekk Nvidia-versjon (modinfo ligger i kmod-pakken, som ikke alltid er installert)
 sudo zypper --auto-agree-with-licenses install -y kmod
-echo -e "\nSjekker Nvidia-versjon, om det ikke kommer opp et versjonsnummer, vent noen minutter før du går videre:"
-/usr/sbin/modinfo -F version nvidia || modinfo -F version nvidia
+echo -e "\nSjekker Nvidia-driverstatus, om det ikke kommer opp et versjonsnummer, vent noen minutter før du går videre:"
+if [ -x /usr/sbin/modinfo ]; then
+    /usr/sbin/modinfo -F version nvidia
+elif [ -x /usr/sbin/nvidia-smi ]; then
+    /usr/sbin/nvidia-smi --query-gpu=driver_version --format=csv,noheader
+else
+    echo "Hverken modinfo eller nvidia-smi fant driveren ennå — vent noen minutter og kontroller manuelt etter restart."
+fi
 read -p "Trykk [Enter] for å fortsette..."
 
 # Installerer Nvidia GeForce Now (strømming av spill).
 # NB: Nvidias flatpak-repo har av og til ødelagt metadata ("no summary found"). Dette steget er ikke kritisk
-# for gaming-oppsettet, så hvis det feiler hopper skriptet over det. Prøv igjen senere eller installer fra flathub.
+# for gaming-oppsettet, så hvis det feiler hopper skriptet over det. Prøv igjen senere.
 echo -e "\nInstallerer Nvidia GeForce NOW for strømming av spill (via Flatpak)."
 flatpak remote-add --user --if-not-exists GeForceNOW https://international.download.nvidia.com/GFNLinux/flatpak/geforcenow.flatpakrep
 if flatpak install --user -y GeForceNOW com.nvidia.geforcenow; then
@@ -98,7 +104,7 @@ echo -e "\nInstallerer Heroic Launcher via Flatpak (for å kunne spille spill fr
 flatpak install --user -y flathub com.heroicgameslauncher.hgl
 read -p "Trykk [Enter] for å fortsette..."
 
-# Justerer kjerneparametre for gaming.t.
+# Justerer kjerneparametre for gaming.
 echo -e "\nJusterer kjerneparametre for gaming (preempt=full og transparent_hugepage=always)."
 if grep -q '^GRUB_CMDLINE_LINUX_DEFAULT=' /etc/default/grub; then
     sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT="\([^"]*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 preempt=full transparent_hugepage=always"/' /etc/default/grub
