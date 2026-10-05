@@ -5,12 +5,12 @@
 # Skriptet vil også gjøre noen steg som forbedrer ytelsen på Tumbleweed for gaming.
 # Skriptet er ment for openSUSE Tumbleweed (rolling release). Det passer IKKE for openSUSE Leap (andre repo-URLer og driverpakker der).
 # En forutsetning for dette skriptet er at de offisielle repoene (oss, non-oss, update) er aktivert, noe som er standard ved installasjon.
+
 # For å kunne kjøre skriptet etter nedlasting må du åpne en terminal i mappen du har lastet ned skriptet og bruke kommandoene:
 # chmod +x opensuse_nvidia_gaming.sh
 # ./opensuse_nvidia_gaming.sh
 
 # Sjekker at Tumbleweed er helt oppdatert før du starter.
-# --gpg-auto-import-keys godtar eventuelle nye repo-nøkler automatisk (Packman/Nvidia), så ingen prompt stopper skriptet.
 echo -e "\nSjekker at systemet er helt oppdatert før vi starter. Underveis kan det hende at du må skrive inn passordet ditt flere ganger."
 echo -e "På Tumbleweed oppgraderer vi med 'zypper dup' (dist-upgrade), som er riktig måte å holde en rolling release oppdatert på."
 sudo zypper --gpg-auto-import-keys dup -y
@@ -67,8 +67,6 @@ fi
 read -p "Trykk [Enter] for å fortsette..."
 
 # Bytter ut åpne ffmpeg codecs med fullversjonen fra Packman (trengs ofte for cutscenes og intro til spill).
-# Packman er det etablerte tredjeparts-repoet for kodeker på openSUSE, og er nødvendig fordi de offisielle repoene
-# kun leverer frie/åpne codecs.
 echo -e "\nLegger til Packman-repoet og bytter til full ffmpeg med alle codecs."
 sudo zypper --gpg-auto-import-keys addrepo -cfp 90 'https://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Tumbleweed/' packman
 sudo zypper --gpg-auto-import-keys --auto-agree-with-licenses install -y --from packman ffmpeg libavcodec-full libavdevice-full
