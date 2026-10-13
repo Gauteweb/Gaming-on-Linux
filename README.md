@@ -9,7 +9,7 @@ Har du installert [Fedora Workstation](https://fedoraproject.org/workstation/) e
 
 Isåfall har jeg her laget et [skript som installerer alt du måtte trenge av drivere og programvare](https://github.com/Gauteweb/GNU-Linux/blob/main/fedora_nvidia_gaming.sh) for å enkelt komme igang med gaming på Linux. 
 
-![Min desktop](https://github.com/Gauteweb/GNU-Linux/blob/main/stormtrooper_desktop.jpg)
+![Min desktop](stormtrooper_desktop.jpg)
 
 Bare [kjør skriptet](fedora_nvidia_gaming.sh), ta en restart og voila: Du har en super gaming-maskin med de nyeste og beste Nvidia-driverne og alt du trenger av programvare for å starte og spille, bare logg inn på Steam, GOG eller Epic og last ned spillene dine. Du kan også strømme spill fra Nvidia GeForce NOW om du har bra nok nettverk.
 
