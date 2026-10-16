@@ -10,22 +10,62 @@
 # chmod +x opensuse_nvidia_gaming.sh
 # ./opensuse_nvidia_gaming.sh
 
+# Sjekker at skriptet faktisk kjører på openSUSE Tumbleweed (passer ikke for Leap eller andre distroer).
+if ! grep -q 'ID=opensuse-tumbleweed' /etc/os-release; then
+    echo "Dette skriptet er kun for openSUSE Tumbleweed — avbryter."
+    exit 1
+fi
+
+# Sjekker at det faktisk finnes et Nvidia-kort i maskinen (myk advarsel, avbryter ikke).
+if command -v lspci > /dev/null 2>&1 && ! lspci | grep -qi nvidia; then
+    echo "Advarsel: fant ingen Nvidia-grafikkort i systemet (lspci). Skriptet er ment for maskiner med Nvidia-kort."
+fi
+
 # Sjekker at Tumbleweed er helt oppdatert før du starter.
 echo -e "\nSjekker at systemet er helt oppdatert før vi starter. Underveis kan det hende at du må skrive inn passordet ditt flere ganger."
 echo -e "På Tumbleweed oppgraderer vi med 'zypper dup' (dist-upgrade), som er riktig måte å holde en rolling release oppdatert på."
-sudo zypper --gpg-auto-import-keys dup -y
+sudo zypper --gpg-auto-import-keys --auto-agree-with-licenses dup -y
 read -p "Trykk [Enter] for å starte..."
 
 # Oppstart av skript
 echo -e "\nDette skriptet vil installere drivere for moderne Nvidia grafikkort og annen programvare du trenger for å spille på openSUSE Tumbleweed."
 read -p "Trykk [Enter] for å fortsette..."
 
-# Legger til Nvidias offisielle repo for Tumbleweed og installerer Nvidia-drivere (G06-driveren, for kort fra 2017 og nyere).
-# Obs: Hvis Secure Boot er aktivert i BIOS/UEFI, må du enten deaktivere det eller selv signere Nvidia-kjernemodulen, ellers starter ikke driveren.
-echo -e "\nLegger til Nvidias offisielle repo og installerer nyeste Nvidia-drivere (G06)."
-echo -e "NB: Hvis Secure Boot er aktivert i BIOS kan det skape problemer ved restart. Enkleste løsning er å deaktivere Secure Boot i BIOS."
-sudo zypper --gpg-auto-import-keys addrepo --refresh https://download.nvidia.com/opensuse/tumbleweed/ nvidia
-sudo zypper --gpg-auto-import-keys --auto-agree-with-licenses install -y x11-video-nvidiaG06
+# Legger til Nvidias offisielle repo for Tumbleweed og installerer Nvidia-drivere.
+# Nvidia-pakkenavnene er omorganisert (2025): for kort fra Turing-generasjonen og nyere (GTX 16xx, RTX 20xx og nyere)
+# brukes G07-driveren med åpne kjernemoduler som er ferdigbygget og signert for Secure Boot.
+# Eldre kort (GeForce 700-serien til GTX 10xx) bruker den proprietære G06-driveren, som ikke er Secure Boot-signert.
+echo -e "\nLegger til Nvidias offisielle repo og installerer nyeste Nvidia-driver."
+if ! zypper lr nvidia > /dev/null 2>&1; then
+    sudo zypper --gpg-auto-import-keys addrepo --refresh https://download.nvidia.com/opensuse/tumbleweed/ nvidia
+fi
+echo -e "Nvidia-driveren finnes i to varianter:"
+echo -e "  1) G07 (anbefalt): Turing og nyere — GTX 16xx, RTX 20xx og nyere (fra 2018). Kjernemodulen er signert, så Secure Boot fungerer."
+echo -e "  2) G06: eldre kort — GeForce 700-serien til GTX 10xx (2014-2017). Obs: ikke signert, så Secure Boot må deaktiveres i BIOS."
+read -p "Hvilken generasjon er grafikkortet ditt? Skriv 1 eller 2 og trykk [Enter]: " gpu_valg
+if [ "$gpu_valg" = "1" ]; then
+    nvidia_pakker="nvidia-open-driver-G07-signed-kmp-meta"
+elif [ "$gpu_valg" = "2" ]; then
+    nvidia_pakker="nvidia-driver-G06-kmp-default nvidia-video-G06 nvidia-gl-G06 nvidia-compute-G06"
+else
+    echo "Ugyldig valg — avbryter. Kjør skriptet på nytt og velg 1 eller 2."
+    exit 1
+fi
+if ! sudo zypper --gpg-auto-import-keys --auto-agree-with-licenses install -y $nvidia_pakker; then
+    echo -e "\nFeil: Nvidia-driveren kunne ikke installeres (sjekk nettverk og repo-URL). Avbryter skriptet."
+    exit 1
+fi
+
+# 32-bit Nvidia-biblioteker trengs av Steam og mange spill via Proton/Wine.
+if [ "$gpu_valg" = "1" ]; then
+    nvidia_32bit_pakker="nvidia-gl-G07-32bit nvidia-video-G07-32bit"
+else
+    nvidia_32bit_pakker="nvidia-gl-G06-32bit nvidia-video-G06-32bit"
+fi
+echo -e "\nInstallerer 32-bit Nvidia-biblioteker (trengs av Steam og eldre 32-bit spill)."
+if ! sudo zypper --auto-agree-with-licenses install -y $nvidia_32bit_pakker; then
+    echo -e "\nAdvarsel: 32-bit-bibliotekene kunne ikke installeres. Dette er ikke kritisk, men enkelte eldre spill kan feile."
+fi
 read -p "Trykk [Enter] for å fortsette..."
 
 nedtellingsfunksjon() {
@@ -38,20 +78,28 @@ nedtellingsfunksjon() {
     printf "\r60 sekunder har gått — fortsetter!     \n\n"
 }
 
-echo "Kjernemodulen bygges ferdig i bakgrunnen, så vi venter et minutt."
+echo "Vi venter et minutt før vi tester driver-versjonen, slik at pakkeoppsettet rekker å bli ferdig."
 nedtellingsfunksjon    # venter 60 sekunder med live nedtelling
 
-# Sjekk Nvidia-versjon (modinfo ligger i kmod-pakken, som ikke alltid er installert)
+# Sjekk Nvidia-versjon (modinfo ligger i kmod-pakken)
 sudo zypper --auto-agree-with-licenses install -y kmod
 echo -e "\nSjekker Nvidia-driverstatus, om det ikke kommer opp et versjonsnummer, vent noen minutter før du går videre:"
-if [ -x /usr/sbin/modinfo ]; then
+if command -v modinfo > /dev/null 2>&1; then
+    modinfo -F version nvidia
+elif [ -x /usr/sbin/modinfo ]; then
     /usr/sbin/modinfo -F version nvidia
-elif [ -x /usr/sbin/nvidia-smi ]; then
-    /usr/sbin/nvidia-smi --query-gpu=driver_version --format=csv,noheader
+elif command -v nvidia-smi > /dev/null 2>&1; then
+    nvidia-smi --query-gpu=driver_version --format=csv,noheader
 else
     echo "Hverken modinfo eller nvidia-smi fant driveren ennå — vent noen minutter og kontroller manuelt etter restart."
 fi
 read -p "Trykk [Enter] for å fortsette..."
+
+# Sjekker at Flatpak er installert (er standard på KDE, men kan mangle).
+if ! command -v flatpak > /dev/null 2>&1; then
+    echo -e "\nInstallerer Flatpak (ikke funnet på systemet)."
+    sudo zypper --auto-agree-with-licenses install -y flatpak
+fi
 
 # Installerer Nvidia GeForce Now (strømming av spill).
 # NB: Nvidias flatpak-repo har av og til ødelagt metadata ("no summary found"). Dette steget er ikke kritisk
@@ -68,7 +116,9 @@ read -p "Trykk [Enter] for å fortsette..."
 
 # Bytter ut åpne ffmpeg codecs med fullversjonen fra Packman (trengs ofte for cutscenes og intro til spill).
 echo -e "\nLegger til Packman-repoet og bytter til full ffmpeg med alle codecs."
-sudo zypper --gpg-auto-import-keys addrepo -cfp 90 'https://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Tumbleweed/' packman
+if ! zypper lr packman > /dev/null 2>&1; then
+    sudo zypper --gpg-auto-import-keys addrepo -cfp 90 'https://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Tumbleweed/' packman
+fi
 sudo zypper --gpg-auto-import-keys --auto-agree-with-licenses install -y --from packman ffmpeg libavcodec-full libavdevice-full
 read -p "Trykk [Enter] for å fortsette..."
 
@@ -80,6 +130,7 @@ read -p "Trykk [Enter] for å fortsette..."
 # Installere GameMode
 echo -e "\nInstallerer GameMode via Zypper (det kan hende dette er installert fra før)."
 sudo zypper --auto-agree-with-licenses install -y gamemode
+echo -e "Tips: GameMode aktiveres per spill i Steam ved å legge 'gamemoderun %command%' i startvalgene til spillet."
 read -p "Trykk [Enter] for å fortsette..."
 
 # Installere ProtonPlus
@@ -102,19 +153,25 @@ echo -e "\nInstallerer Heroic Launcher via Flatpak (for å kunne spille spill fr
 flatpak install --user -y flathub com.heroicgameslauncher.hgl
 read -p "Trykk [Enter] for å fortsette..."
 
-# Justerer kjerneparametre for gaming.
+# Justerer kjerneparametre for gaming (idempotent: parametrene legges bare til hvis de ikke finnes fra før).
 echo -e "\nJusterer kjerneparametre for gaming (preempt=full og transparent_hugepage=always)."
-if grep -q '^GRUB_CMDLINE_LINUX_DEFAULT=' /etc/default/grub; then
-    sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT="\([^"]*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 preempt=full transparent_hugepage=always"/' /etc/default/grub
+if grep -q 'preempt=full' /etc/default/grub && grep -q 'transparent_hugepage=always' /etc/default/grub; then
+    echo "Kjerneparametrene står allerede i /etc/default/grub — ingen endring nødvendig."
 else
-    echo 'GRUB_CMDLINE_LINUX_DEFAULT="preempt=full transparent_hugepage=always"' | sudo tee -a /etc/default/grub > /dev/null
+    if grep -q '^GRUB_CMDLINE_LINUX_DEFAULT=' /etc/default/grub; then
+        sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT="\([^"]*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 preempt=full transparent_hugepage=always"/' /etc/default/grub
+    else
+        echo 'GRUB_CMDLINE_LINUX_DEFAULT="preempt=full transparent_hugepage=always"' | sudo tee -a /etc/default/grub > /dev/null
+    fi
+    # Rydder bort ledende mellomrom hvis linjen var tom fra før.
+    sudo sed -i 's/^\(GRUB_CMDLINE_LINUX_DEFAULT="\) /\1/' /etc/default/grub
+    sudo grub2-mkconfig -o /boot/grub2/grub.cfg
 fi
-sudo grub2-mkconfig -o /boot/grub2/grub.cfg
 read -p "Trykk [Enter] for å fortsette..."
 
 # Fullført melding
 echo -e "\nNå er openSUSE Tumbleweed klart for gaming, men ta en restart først, så du er sikker på at de beste Nvidia-driverne og de oppdaterte kjerneparameterne blir brukt."
-echo -e "\nHvis restart feiler, prøv å deaktivere Secure Boot i BIOS."
+echo -e "\nHvis restart feiler og du valgte G06-driveren (eldre kort), prøv å deaktivere Secure Boot i BIOS."
 echo -e "\nTips: Tumbleweed tar automatisk Btrfs-snapshots med Snapper før alle systemoppgraderinger. Hvis en oppdatering skulle ødelegge noe, kan du boote tilbake til forrige snapshot fra GRUB-menyen og rulle tilbake med 'sudo snapper rollback' (etterfulgt av restart)."
 echo -e
 read -p "Trykk [Enter] for å ta en restart av PC'en..."
